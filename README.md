@@ -14,6 +14,8 @@ RESTful Plant uses a Capacitive Moisture Sensor and a Light Dependent Resistor t
 
 Data is shared between the Teensy and an ESP8266 over Serial. The ESP8266 connects to your local wifi and hosts a RESTful API. The user can make HTTP requests to the ESP8266 and expect to recieve a JSON object containing the plant's status.
 
+![Diagram](https://i.imgur.com/LpstiQu.png)
+
 ## Features
  - [x] Soil moisture sensing using a capacitive moisture sensor
  - [x] Light sensing using a LDR
@@ -28,4 +30,4 @@ Data is shared between the Teensy and an ESP8266 over Serial. The ESP8266 connec
 
 
 ## License
-<p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" class="license-text"><a rel="cc:attributionURL" href="https://github.com/yaclive/restful-plant"><span rel="dct:title">RESTful Plant</span></a> by <a rel="cc:attributionURL" href="yaclive.github.com"><span rel="cc:attributionName">Clive Cooper</span></a>CC BY-NC 4.0<a href="https://creativecommons.org/licenses/by-nc/4.0"><img style="height:22px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc_icon.svg" /><img  style="height:22px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-by_icon.svg" /><img  style="height:22px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-nc_icon.svg" /></a></p>
+<p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" class="license-text"><a rel="cc:attributionURL" href="https://github.com/yaclive/restful-plant"><span rel="dct:title">RESTful Plant</span></a> by <a rel="cc:attributionURL" href="yaclive.github.com"><span rel="cc:attributionName">Clive Cooper</span></a> CC BY-NC 4.0<a href="https://creativecommons.org/licenses/by-nc/4.0"><img style="height:22px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc_icon.svg" /><img  style="height:22px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-by_icon.svg" /><img  style="height:22px!important;margin-left: 3px;vertical-align:text-bottom;" src="https://search.creativecommons.org/static/img/cc-nc_icon.svg" /></a></p>
