@@ -1,6 +1,8 @@
 # RESTful Plant
 By Clive Cooper
 
+<img src="https://i.imgur.com/1QlZfPb.png" width="40%" />
+
 ## What is it?
 RESTful Plant adds an undo function to horticulture. It adds the ability to draw nice colourful graphs to let you know exactly why you suck at growing plants. It serves as a conversation starter when your guests ask, "why exactly to you have a USB stick stuck in a pot of soil?". 
 
