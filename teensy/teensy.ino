@@ -1,18 +1,26 @@
 #define HWSERIAL Serial1
 
+elapsedMillis secondTimer;
+int uptime = 0;
+elapsedMillis ESPTimer;
 elapsedMillis plantTimer;
-const int timerDur = 500;
-int timerVarSelect = 0;
+const int ESPTimerDur = 500;
+const int plantTimerDur = 1000 * 60 * 10; // 10 minutes
+int ESPTimerVarSelect = 0;
 
 const int moistSensorPin = A2;
 const int lightSensorPin = A1;
+
+
+int lightMin = 9999;
+int lightMax = 0;
 
 int moistSensorVal = 0;
 int lightSensorVal = 0;
 
 int plantHealth = 100;
 int plantSatasfaction = 0; // -2 very unsatasfied -1 unsatasfied 0 neutral 1 satasfied 2 very satasfied
-int plantSatasMult = 1; // How much satasfaction influences health
+float plantSatasMult = 0.2; // How much satasfaction influences health
 int plantAge = 0;
 bool plantAlive = true;
 
@@ -27,10 +35,41 @@ void setup() {
 void readSensors() {
   moistSensorVal = analogRead(moistSensorPin);
   lightSensorVal = analogRead(lightSensorPin);
+
+  if (uptime < 86400) { // 1 day
+    if (lightSensorVal > lightMax) {
+      lightMax = lightSensorVal;
+    }
+    if (lightSensorVal < lightMin) {
+      lightMin = lightSensorVal;
+    }
+  }
 }
 
 void updatePlant() {
-  
+  plantSatasfaction = 0;
+  if (moistSensorVal < 950) { // Soil is moist
+    plantSatasfaction++;
+  }
+  else if (moistSensorVal > 1000) {
+    plantSatasfaction--;
+  }
+  if (lightSensorVal > (lightMax - 200)) { // Light room
+    plantSatasfaction++;
+  }
+  else if (lightSensorVal < (lightMin + 200)) {
+    plantSatasfaction--;
+  }
+
+  plantHealth += (plantSatasfaction * plantSatasMult);
+  if (plantHealth > 100) {
+    plantHealth = 100;
+  }
+  else if (plantHealth < 0) {
+    plantHealth = 0;
+    plantAlive = false;
+  }
+  plantAge ++;
 }
 
 void sendDataToESP(int varSelect) {
@@ -52,7 +91,8 @@ void sendDataToESP(int varSelect) {
       break;
     case 5:
       HWSERIAL.print("Alive:" + String(plantAlive) + "\n");
-      break; 
+      break;
+    
   }
 }
 
@@ -70,15 +110,24 @@ void loop() {
     Serial.write(incomingByte);
   }
 
-  if (plantTimer >= timerDur) {
+  if (secondTimer >= 1000) {
+    secondTimer = 0;
+    
+    uptime ++;
+  }
+  if (plantTimer >= plantTimerDur) {
     plantTimer = 0;
 
-    readSensors();
-    updatePlant();
-    sendDataToESP(timerVarSelect);
+    if (plantAlive && uptime > 86400) updatePlant(); // Plant is alive and has been alive longer than a day
+  }
+  if (ESPTimer >= ESPTimerDur) {
+    ESPTimer = 0;
 
-    timerVarSelect++;
-    timerVarSelect %= 6;
+    readSensors();
+    sendDataToESP(ESPTimerVarSelect);
+
+    ESPTimerVarSelect++;
+    ESPTimerVarSelect %= 6;
   }
   
   //delay(10);

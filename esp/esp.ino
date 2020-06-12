@@ -30,8 +30,8 @@ String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;     // whether the string is complete
 // Arrays to hold API data
 // Max 6 AVPs with 10 chars each
-char AttributeName[6][10];
-char ValueName[6][10];
+char AttributeName[10][10];
+char ValueName[10][10];
 byte TotAttrs = 0;
 
 // Handle WiFi
@@ -61,9 +61,8 @@ void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
 }
 
 void notFound(AsyncWebServerRequest *request) {
-    request->send(404, "text/plain", "Not found");
+  request->send(404, "text/plain", "Not found");
 }
-
 
 void setup() {
   Serial.begin(115200);
@@ -87,28 +86,29 @@ void setup() {
 
   // Automatically sync UTC time using NTP
   configTime(0, 0, "pool.ntp.org");
-  //  Time zone description https://sites.google.com/a/usapiens.com/opnode/time-zones
+  //  Time zone description
+https://sites.google.com/a/usapiens.com/opnode/time-zones
   setenv("TZ", "NZST-12NZDT-13,M10.1.0/02:00:00,M3.3.0/03:00:00", 1);
   tzset();
 
   // Webserver handler
   // Send a GET request to <IP>/?message=<message>
-  server.on("/", HTTP_GET, [] (AsyncWebServerRequest *request) {
-      String message;
-      String myTime;
-      // Get Time
-      time_t now = time(nullptr);
-      timeinfo = localtime(&now);
-      myTime = String(asctime(timeinfo));
-      myTime.trim();
-      message =   "{ \"ESP_RSSI_dBm\":"+ String(WiFi.RSSI()) +",\n";
-      message +=  "\"Time\":\""+ myTime + "\""; //+",\n";
-      for (byte i = 0; i < TotAttrs; i++) {
-        message += ",\n";
-        message += "\""+String(AttributeName[i])+"\":"+ String(ValueName[i]);
-      }
-      message +=  "\n}";
-      request->send(200, "text/plain",  message );
+  server.on("/", HTTP_GET, [] (AsyncWebServerRequest * request) {
+    String message;
+    String myTime;
+    // Get Time
+    time_t now = time(nullptr);
+    timeinfo = localtime(&now);
+    myTime = String(asctime(timeinfo));
+    myTime.trim();
+    message =   "{\n\"ESP_RSSI_dBm\":" + String(WiFi.RSSI()) + ",\n";
+    message +=  "\"ESP_Time\":\"" + myTime + "\"";
+    for (byte i = 0; i < TotAttrs; i++) {
+      message += ",\n\"" + String(AttributeName[i]) + "\":" +
+                 String(ValueName[i]);
+    }
+    message +=  "\n}";
+    request->send(200, "text/plain",  message );
   });
   server.onNotFound(notFound);
 
@@ -116,15 +116,7 @@ void setup() {
 
 }
 
-void GetTimeNow() {
-  // Get Time
-  time_t now = time(nullptr);
-  timeinfo = localtime(&now);
-  Serial.print(asctime(timeinfo));
-  Serial.println(WiFi.RSSI());
-}
 void loop() {
-  //GetTimeNow();
   if (Serial.available()) serialEvent();
   if (stringComplete) {
     Serial.print("ESP_API:InputString-");
@@ -134,28 +126,32 @@ void loop() {
     // clear the string:
     inputString = "";
     stringComplete = false;
-  } 
-  //delay(1000);
+  }
 }
 
 void serialEvent() {
   while (Serial.available()) {
     char inChar = (char)Serial.read();  // get the new byte:
     if (inChar == '\n') {
-      stringComplete = true;            // if the incoming character is a newline, set the flag
+      stringComplete = true;            // if the incoming character is
+      a newline, set the flag
     } else inputString += inChar;       // add it to the inputString:
   }
 }
 
 void analyzeString ( const char* attr )
 {
-  char*  value ;                                 // Points to value after : in command
+  char*  value ;                                 // Points to value
+after : in command
 
-  value = strstr ( attr, ":" ) ;                 // See if command contains a ":"
+  value = strstr ( attr, ":" ) ;                 // See if command
+  contains a ":"
   if ( value )
   {
-    *value = '\0' ;                              // Separate command from value
-    value++ ;                                    // Points to value after ":"
+    *value = '\0' ;                              // Separate command
+    from value
+    value++ ;                                    // Points to value
+    after ":"
   }
   else
   {
@@ -174,7 +170,7 @@ void AddToAVPArray ( const char* atr, const char* val )
   attr.trim();
   value = String(val);
   value.trim();
- 
+
   Serial.print("ESP_API:Attribute-");
   Serial.println(attr);
   Serial.print("ESP_API:Value-");
@@ -191,16 +187,16 @@ void AddToAVPArray ( const char* atr, const char* val )
     attr.toCharArray(AttributeName[TotAttrs], 9);
     value.toCharArray(ValueName[TotAttrs], 9);
     TotAttrs ++;
-    if (TotAttrs > 5) TotAttrs = 5;
+    if (TotAttrs > 9) TotAttrs = 9;
   } else { // Have one already
-     value.toCharArray(ValueName[ThisOne], 9);
+    value.toCharArray(ValueName[ThisOne], 9);
   }
 
-//  for (byte i = 0; i < 6; i++) {
-//    Serial.print(i);
-//    Serial.print(" ");
-//    Serial.print(AttributeName[i]);
-//    Serial.print(" ");
-//    Serial.println(ValueName[i]);   
-//  }
+  //  for (byte i = 0; i < 6; i++) {
+  //    Serial.print(i);
+  //    Serial.print(" ");
+  //    Serial.print(AttributeName[i]);
+  //    Serial.print(" ");
+  //    Serial.println(ValueName[i]);
+  //  }
 }
